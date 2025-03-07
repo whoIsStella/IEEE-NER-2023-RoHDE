@@ -123,7 +123,7 @@ for i in range(1):
             with torch.no_grad():
                 fake = gen(last_noise,last_label)
                 correlation = cross_correlation((last_real.detach().cpu().numpy().reshape(-1)),(fake.detach().cpu().numpy().reshape(-1)))
-                dtw,path = fastdtw((last_real.detach().cpu().numpy().reshape(-1)),(fake.detach().cpu().numpy().reshape(-1)),dist=euclidean)
+                dtw,path = fastdtw((last_real.detach().cpu().numpy().reshape(-1)),(fake.detach().cpu().numpy().reshape(-1)),dist=2)
             writer.add_scalar("Training D Loss",round(loss_critic.item(),4),epoch)
             writer.add_scalar("Training G Loss",round(loss_gen.item(),4),epoch)
             writer.add_scalar("correlation",round(correlation.item(),4),epoch)
