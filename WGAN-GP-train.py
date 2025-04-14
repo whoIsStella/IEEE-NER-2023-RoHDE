@@ -1,6 +1,12 @@
 
 """
 Training of WGAN-GP
+
+conda env remove -n sEMG
+conda env create -f environment.yml
+
+To Destroy
+conda env remove -n sEMG
 """
 
 import torch
