@@ -28,12 +28,12 @@ from torchvision.transforms import ToTensor
 # Hyperparameters etc.
 device = "cuda" if torch.cuda.is_available() else "cpu"
 LEARNING_RATE = 1e-4
-BATCH_SIZE = 64
+BATCH_SIZE = 32 #lowered from 64
 IMAGE_SIZE1 = 8
 IMAGE_SIZE2 = 24
 CHANNELS_IMG = 1
 Z_DIM = 100
-NUM_EPOCHS = 3000
+NUM_EPOCHS = 3000 #lowered from 3000
 FEATURES_CRITIC = 16
 FEATURES_GEN = 16
 CRITIC_ITERATIONS = 5
@@ -42,7 +42,7 @@ LAMBDA_GP = 10
 EMBBED_SIZE = 100
 NUM_CLASSES = 8
 ROOT = "data/noise/CA"
-NUM_WORKERS = 16
+NUM_WORKERS = 2 # reduced from 16 to 2
 # MOBILENET_PRETRAIN_WEIGHT = "weight/ICELab/Mobilenet/Training_noise_testnoise/CA_CA/94.2069"
 BASE_WEIGHT_PATH = "weight/TestGan/"
 BASE_LOG_PATH = "Experiment_data/TestGAN/"
