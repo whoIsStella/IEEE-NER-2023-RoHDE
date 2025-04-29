@@ -30,7 +30,7 @@ The noisy EMG data set consists of the following seven hand and wrist gestures: 
   - fastdtw  
 #### Install Dependency
 ```
-conda create -n RoHDE -f enviroment.yml
+conda env create -n RoHDE -f environment.yml
 ```
 ```
 conda activate RoHDE
