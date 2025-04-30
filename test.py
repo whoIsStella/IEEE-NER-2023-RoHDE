@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-# To ensure PyTorch and plotting libs are installed, run:
-# pip install torch torchvision tensorboard fastdtw scipy
+
 
 import os
 import glob
@@ -19,7 +17,7 @@ from fastdtw import fastdtw
 from torchvision.transforms import ToTensor
 import PIL.Image
 
-# ── Argument parsing ──────────────────────────────────────────────────────────────
+# ── Argument parsing
 parser = argparse.ArgumentParser(description="Train WGAN-GP on EMG data")
 parser.add_argument("--start-epoch",   type=int, default=1,
                     help="Epoch to start from (inclusive)")
@@ -34,7 +32,7 @@ end_epoch   = args.end_epoch
 ckpt_dir    = args.checkpoint_dir
 os.makedirs(ckpt_dir, exist_ok=True)
 
-# ── Hyperparameters ───────────────────────────────────────────────────────────────
+
 device           = "cuda" if torch.cuda.is_available() else "cpu"
 LEARNING_RATE    = 1e-4
 BATCH_SIZE       = 64
@@ -55,10 +53,8 @@ ROOT             = "data/noise/CA"
 BASE_LOG_PATH    = "Experiment_data/TestGAN/"
 BASE_WEIGHT_PATH = "weight/TestGan/"
 
-# ── Set up AMP scaler ─────────────────────────────────────────────────────────────
 scaler = GradScaler(device_type="cuda") if device=="cuda" else None
 
-# ── DataLoader ───────────────────────────────────────────────────────────────────
 ds = dataset(
     root=ROOT,
     image_size1=IMAGE_SIZE1,
@@ -76,10 +72,9 @@ loader = DataLoader(
     pin_memory=(device=="cuda")
 )
 
-# ── TensorBoard ──────────────────────────────────────────────────────────────────
+
 writer = SummaryWriter(BASE_LOG_PATH)
 
-# ── Model & optimizers ───────────────────────────────────────────────────────────
 gen    = Generator(Z_DIM, CHANNELS_IMG, FEATURES_GEN, IMAGE_SIZE1, IMAGE_SIZE2, EMBED_SIZE, NUM_CLASSES).to(device)
 critic = Discriminator(CHANNELS_IMG, FEATURES_CRITIC, IMAGE_SIZE1, IMAGE_SIZE2, NUM_CLASSES).to(device)
 initialize_weights(gen)
@@ -93,7 +88,7 @@ if hasattr(torch, "compile"):
 opt_gen    = optim.Adam(gen.parameters(),    lr=LEARNING_RATE, betas=(0.0,0.9))
 opt_critic = optim.Adam(critic.parameters(), lr=LEARNING_RATE, betas=(0.0,0.9))
 
-# ── Resume from last checkpoint ───────────────────────────────────────────────────
+
 ckpts = sorted(glob.glob(f"{ckpt_dir}/checkpoint_epoch*.pt"))
 if ckpts:
     state = torch.load(ckpts[-1], map_location=device)
@@ -104,7 +99,6 @@ if ckpts:
     start_epoch = state["epoch"] + 1
     print(f"Resuming from {ckpts[-1]}, starting at epoch {start_epoch}")
 
-# ── Precompute static tensors ────────────────────────────────────────────────────
 x     = torch.linspace(-torch.pi, torch.pi, Z_DIM, device=device)
 sin_x = torch.sin(x)
 fixed_noise = torch.randn(32, Z_DIM, 1, 1, device=device)
@@ -112,7 +106,6 @@ fixed_noise = torch.randn(32, Z_DIM, 1, 1, device=device)
 gen.train()
 critic.train()
 
-# ── Main training loop ────────────────────────────────────────────────────────────
 for epoch in range(start_epoch, end_epoch + 1):
     pbar = tqdm(loader, desc=f"Epoch {epoch}/{end_epoch}", leave=False)
     for real, labels in pbar:
@@ -155,7 +148,7 @@ for epoch in range(start_epoch, end_epoch + 1):
                 torch.nn.utils.clip_grad_norm_(critic.parameters(),1.0)
                 opt_critic.step()
 
-        # Generator update
+     
         opt_gen.zero_grad()
         with autocast(device_type="cuda", enabled=(device=="cuda")):
             fake2 = gen(noise, labels)
@@ -168,7 +161,6 @@ for epoch in range(start_epoch, end_epoch + 1):
             loss_gen.backward()
             opt_gen.step()
 
-        # Progress bar
         pbar.set_postfix({
             "D_loss": f"{loss_critic.item():.4f}",
             "G_loss": f"{loss_gen.item():.4f}"
@@ -186,7 +178,6 @@ for epoch in range(start_epoch, end_epoch + 1):
         }, ckpt_path)
         print(f"Saved checkpoint: {ckpt_path}")
 
-    # (Optional) TensorBoard scalars, image logging…  
 
 print("Training complete.")  
 
