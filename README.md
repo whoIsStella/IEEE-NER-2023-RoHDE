@@ -18,14 +18,12 @@ The noisy EMG data set consists of the following seven hand and wrist gestures: 
 
 ## Quick Start
 ### Dependency
-  name: RoHDE
-  
+```
+name: RoHDE
 channels:
-
   - conda-forge
   - defaults
 dependencies:
-
   - python=3.9
   - pytorch
   - torchvision
@@ -35,10 +33,10 @@ dependencies:
   - numpy
   - matplotlib
   - tensorboard
-    
 pip:
-
   - fastdtw
+
+```
   
 #### Install Dependency
 ```
