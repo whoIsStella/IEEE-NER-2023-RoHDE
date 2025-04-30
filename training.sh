@@ -1,12 +1,13 @@
 #!/bin/bash
 #
 # ───────────── SBATCH OPTIONS ─────────────
+#SBATCH --array=1-8
 #SBATCH --job-name=RoHDE              # job name
 #SBATCH --partition=gpucluster
 #SBATCH --gres=gpu:2
 #SBATCH --ntasks=1
-#SBATCH --time=06:30:00              # time limit (hh:mm:ss)
-#SBATCH --cpus-per-task=1  
+#SBATCH --time=8:00:00              # time limit (hh:mm:ss)
+#SBATCH --cpus-per-task=4 
 #SBATCH --output=slurm-%j.out
 #SBATCH --error=slurm-%j.err
 
@@ -25,14 +26,27 @@ echo "Conda env:" $(conda info --envs)
 which python
 python --version
 
+pip install --upgrade fastdtw
+
+echo "Running on node $(hostname), GPU(s):"
+nvidia-smi --query-gpu=name --format=csv
+
+# Compute epoch ranges
+EPOCHS_PER_JOB=500
+START_EPOCH=$(( (SLURM_ARRAY_TASK_ID-1) * EPOCHS_PER_JOB + 1 ))
+END_EPOCH=$(( SLURM_ARRAY_TASK_ID * EPOCHS_PER_JOB ))
+
+echo "This is array task $SLURM_ARRAY_TASK_ID — epochs $START_EPOCH to $END_EPOCH"
+
+
 # Ensure results directory exists
 mkdir -p results
 
 # ───────────── RUN SCRIPTS ─────────────
 
-echo "[$(date +"%T")] Running WGAN-GP-train.py…"
-python -u WGAN-GP-train.py \
-  > results/WGAN-GP-train-${SLURM_JOB_ID}.out 2>&1
+echo "[$(date +"%T")] Task $SLURM_ARRAY_TASK_ID → epochs $START–$END"
+python -u WGAN-GP-train.py --start-epoch $START --end-epoch $END
+  > results/WGAN-GP-${SLURM_JOB_ID}.out 2>&1
 
 echo "[$(date +"%T")] Running EMG-Classifier.py…"
 python -u EMG-Classifier.py \
