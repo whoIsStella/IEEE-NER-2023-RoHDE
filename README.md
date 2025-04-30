@@ -33,6 +33,7 @@ dependencies:
   - numpy
   - matplotlib
   - tensorboard
+  - pip
 pip:
   - fastdtw
 
