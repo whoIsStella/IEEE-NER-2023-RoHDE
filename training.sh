@@ -38,8 +38,6 @@ END_EPOCH=$(( SLURM_ARRAY_TASK_ID * EPOCHS_PER_JOB ))
 
 echo "This is array task $SLURM_ARRAY_TASK_ID — epochs $START_EPOCH to $END_EPOCH"
 
-
-# Ensure results directory exists
 mkdir -p results
 
 # ───────────── RUN SCRIPTS ─────────────
